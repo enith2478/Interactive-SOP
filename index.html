@@ -126,11 +126,39 @@
             margin-right: 8px;
         }
 
-        .quiz-result {
+        .quiz-results {
             background-color: #4b5563;
-            padding: 16px;
+            padding: 20px;
             border-radius: 8px;
-            margin-top: 16px;
+            margin-top: 20px;
+        }
+        
+        .quiz-results h3 {
+            color: #60a5fa;
+            margin-top: 0;
+        }
+        
+        .quiz-score {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .question-result {
+            margin-bottom: 10px;
+        }
+        
+        .correct {
+            color: #34d399;
+        }
+        
+        .incorrect {
+            color: #f87171;
+        }
+        
+        .encouragement {
+            margin-top: 20px;
+            font-style: italic;
         }
 
         .alert {
@@ -349,24 +377,40 @@
             renderQuiz();
         }
 
-        function renderQuizResult() {
+         function renderQuizResult() {
             const score = quizQuestions.filter((q, index) => parseInt(quizAnswers[index]) === q.correctAnswer).length;
-            return `
-                <div class="quiz-result">
-                    <p><strong>Your score: ${score} out of ${quizQuestions.length}</strong></p>
-                    <p>${
-                        score === quizQuestions.length ? "Excellent! You have a perfect score." :
-                        score >= quizQuestions.length * 0.8 ? "Very good! You have a strong understanding of the procedure." :
-                        score >= quizQuestions.length * 0.6 ? "Good job! Review the material again to improve your score." :
-                        "You need more practice. Please review the material carefully."
-                    }</p>
+            const percentage = (score / quizQuestions.length) * 100;
+            
+            let resultHtml = `
+                <div class="quiz-results">
+                    <h3>Quiz Results</h3>
+                    <div class="quiz-score">You scored ${score} out of ${quizQuestions.length} (${percentage.toFixed(2)}%)</div>
+                    ${quizQuestions.map((q, index) => {
+                        const isCorrect = parseInt(quizAnswers[index]) === q.correctAnswer;
+                        return `
+                            <div class="question-result ${isCorrect ? 'correct' : 'incorrect'}">
+                                Question ${index + 1}: ${isCorrect ? 'Correct' : 'Incorrect'}
+                            </div>
+                        `;
+                    }).join('')}
+                    <div class="encouragement">
+                        ${
+                            percentage === 100 ? "Excellent! You have a perfect score. You've mastered the Marmalade Cake SOP!" :
+                            percentage >= 80 ? "Very good! You have a strong understanding of the procedure. Just a bit more practice and you'll be an expert!" :
+                            percentage >= 60 ? "Good job! You're on the right track. Review the material again to improve your score and understanding." :
+                            "Keep practicing! Review the SOP carefully and try the quiz again. With some more study, you'll improve your score."
+                        }
+                    </div>
                 </div>
                 <div class="alert">
                     <div class="alert-title">Report Sent</div>
                     <div>Your results have been sent to your supervisor for review.</div>
                 </div>
             `;
+            
+            return resultHtml;
         }
+
 
         function sendReportToSupervisor(score) {
             console.log(`Sending report to supervisor. Score: ${score}/${quizQuestions.length}`);
